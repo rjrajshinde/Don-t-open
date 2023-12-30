@@ -1,0 +1,71 @@
+import { render, screen, fireEvent } from "@testing-library/react";
+import WorkingDetails from "../src/app/working-details/page";
+
+describe("WorkingDetails Component", () => {
+  it("renders the component without errors", () => {
+    render(<WorkingDetails />);
+    expect(screen.getByText("submit")).toBeInTheDocument();
+  });
+
+  it("displays error messages for required fields on form submission", () => {
+    render(<WorkingDetails />);
+    fireEvent.click(screen.getByText("submit"));
+
+    expect(
+      screen.getByText("Company name cannot be empty.")
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText("organizationType cannot be empty.")
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText("industryType cannot be empty.")
+    ).toBeInTheDocument();
+    // Add more expectations for other required fields
+
+    // Make sure that error messages for other fields are not displayed
+    expect(screen.queryByText("enter address 1")).toBeNull();
+    expect(screen.queryByText("Invalid Pin Code")).toBeNull();
+    // Add more expectations for other fields
+  });
+
+  it("displays error message for invalid email format", () => {
+    render(<WorkingDetails />);
+    fireEvent.change(screen.getByLabelText("Office mailId"), {
+      target: { value: "invalid-email" },
+    });
+    fireEvent.click(screen.getByText("submit"));
+
+    expect(screen.getByText("Invalid officeMailId")).toBeInTheDocument();
+  });
+
+  it("displays error message for invalid pin code format", () => {
+    render(<WorkingDetails />);
+    fireEvent.change(screen.getByLabelText("Office Pincode"), {
+      target: { value: "12345" },
+    });
+    fireEvent.click(screen.getByText("submit"));
+
+    expect(screen.getByText("Invalid Pin Code")).toBeInTheDocument();
+  });
+
+  it("displays error message for invalid phone number format", () => {
+    render(<WorkingDetails />);
+    fireEvent.change(screen.getByLabelText("phoneNo"), {
+      target: { value: "123" },
+    });
+    fireEvent.click(screen.getByText("submit"));
+
+    expect(screen.getByText("enter valid phone no")).toBeInTheDocument();
+  });
+
+  it("updates inputFields state on input change", () => {
+    render(<WorkingDetails />);
+    fireEvent.change(screen.getByLabelText("work address 1"), {
+      target: { value: "123 Main St" },
+    });
+
+    expect(screen.getByLabelText("work address 1").value).toBe("123 Main St");
+  });
+
+  // Add more test cases for different scenarios and edge cases as needed
+});

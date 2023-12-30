@@ -1,0 +1,64 @@
+import React from "react";
+import { render, fireEvent } from "@testing-library/react";
+import WorkingDetails from "../src/app/working-details/page";
+
+describe("WorkingDetails component", () => {
+  it("renders without crashing", () => {
+    render(<WorkingDetails />);
+  });
+
+  it("displays validation errors when submitting an empty form", () => {
+    const { getByText } = render(<WorkingDetails />);
+    fireEvent.click(getByText("submit"));
+
+    expect(getByText("Company name cannot be empty.")).toBeInTheDocument();
+    expect(getByText("organizationType cannot be empty.")).toBeInTheDocument();
+    // Add more expectations for other fields...
+  });
+
+  it("displays validation errors for specific fields", () => {
+    const { getByLabelText, getByText } = render(<WorkingDetails />);
+
+    // Input invalid data to trigger validation errors
+    fireEvent.change(getByLabelText("work address 1"), {
+      target: { value: "A" },
+    });
+    fireEvent.change(getByLabelText("Office Pincode"), {
+      target: { value: "1234567" },
+    });
+    fireEvent.change(getByLabelText("Office mailId"), {
+      target: { value: "invalidEmail" },
+    });
+
+    fireEvent.click(getByText("submit"));
+
+    expect(getByText("enter address 1")).toBeInTheDocument();
+    expect(getByText("Invalid Pin Code")).toBeInTheDocument();
+    expect(getByText("Invalid officeMailId")).toBeInTheDocument();
+    // Add more expectations for other fields...
+  });
+
+  it("submits the form with valid data", () => {
+    const { getByLabelText, getByText } = render(<WorkingDetails />);
+
+    // Input valid data
+    fireEvent.change(getByLabelText("company"), { target: { value: "saab" } });
+    fireEvent.change(getByLabelText("organizationType"), {
+      target: { value: "saab" },
+    });
+    fireEvent.change(getByLabelText("industryType"), {
+      target: { value: "saab" },
+    });
+    fireEvent.change(getByLabelText("work address 1"), {
+      target: { value: "Valid Address" },
+    });
+    // Add more valid data for other fields...
+
+    fireEvent.click(getByText("submit"));
+
+    // Expect that no validation errors are displayed
+    expect(() => getByText("Company name cannot be empty.")).toThrow();
+    expect(() => getByText("organizationType cannot be empty.")).toThrow();
+    // Add more expectations for other fields...
+  });
+});
