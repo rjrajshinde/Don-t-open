@@ -1,0 +1,48 @@
+// formValidation.js
+export const validate = (fieldName, value, regexPattern, errorMessage, errors) => {
+  const trimmedValue = value.trim();
+  const isValid = regexPattern.test(trimmedValue);
+  
+  if (!isValid) {
+    errors[fieldName] = errorMessage;
+  } else {
+    delete errors[fieldName];
+  }
+};
+
+// Your main file
+import React, { useState } from "react";
+import { validate } from "./formValidation";
+
+function WorkingDetails() {
+  const [inputFields, setInputFields] = useState({
+    // ... your state
+  });
+
+  const [errors, setErrors] = useState({});
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setInputFields((prevInputFields) => ({
+      ...prevInputFields,
+      [name]: value,
+    }));
+    validate(name, value, /^[0-9]+$/, "Error message", errors);
+    setErrors({ ...errors }); // Ensure re-render
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    const validationErrors = {};
+    validate("company", inputFields.company, /^[0-9]+$/, "Company name cannot be empty or zero.", validationErrors);
+    // ... Repeat for other fields
+
+    setErrors(validationErrors);
+    console.log("Validation Errors ----", validationErrors);
+    if (Object.keys(validationErrors).length === 0) {
+      alert("Form Submitted Successfully");
+    }
+  };
+
+  // ... rest of your component
+}
