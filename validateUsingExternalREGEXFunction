@@ -1,0 +1,60 @@
+// formValidation.js
+const regexPatterns = {
+  email: /^[a-zA-Z0-9+_.-]+@[a-zA-Z0-9.-]+$/,
+  pincode: /^[1-9][0-9]{5}$/,
+  numeric: /^[0-9]+$/,
+};
+
+export const validateField = (fieldName, value, regexPattern, errorMessage) => {
+  if (!regexPattern.test(value.trim())) {
+    return errorMessage;
+  }
+  return null;
+};
+
+export const validate = (fieldName, value, regexPattern, errorMessage, errors) => {
+  const error = validateField(fieldName, value, regexPattern, errorMessage);
+  if (error) {
+    errors[fieldName] = error;
+  } else {
+    delete errors[fieldName];
+  }
+};
+
+// Your main file
+import React, { useState } from "react";
+import { validate } from "./formValidation";
+
+function WorkingDetails() {
+  const [inputFields, setInputFields] = useState({
+    // ... your state
+  });
+
+  const [errors, setErrors] = useState({});
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setInputFields((prevInputFields) => ({
+      ...prevInputFields,
+      [name]: value,
+    }));
+    validate(name, value, regexPatterns.numeric, "Error message", errors);
+    setErrors({ ...errors }); // Ensure re-render
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    const validationErrors = {};
+    validate("company", inputFields.company, regexPatterns.numeric, "Company name cannot be empty or zero.", validationErrors);
+    // ... Repeat for other fields
+
+    setErrors(validationErrors);
+    console.log("Validation Errors ----", validationErrors);
+    if (Object.keys(validationErrors).length === 0) {
+      alert("Form Submitted Successfully");
+    }
+  };
+
+  // ... rest of your component
+
+}
