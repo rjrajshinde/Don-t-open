@@ -1,0 +1,45 @@
+// Define the validation regex patterns
+const regexPatterns = {
+  email: /^[a-zA-Z0-9+_.-]+@[a-zA-Z0-9.-]+$/,
+  pincode: /^[1-9][0-9]{5}$/,
+  numeric: /^[0-9]+$/,
+};
+
+const validateForm = (inputValues) => {
+  const errors = {};
+
+  const validateField = (fieldName, value, regexPattern, errorMessage) => {
+    if (!regexPattern.test(value.trim())) {
+      errors[fieldName] = errorMessage;
+    } else {
+      delete errors[fieldName];
+    }
+  };
+
+  validateField("company", inputValues.company, regexPatterns.numeric, "Company name cannot be empty or zero.");
+  validateField("organizationType", inputValues.organizationType, regexPatterns.numeric, "Organization type cannot be empty or zero.");
+  validateField("industryType", inputValues.industryType, regexPatterns.numeric, "Industry type cannot be empty or zero.");
+  validateField("workaddress1", inputValues.workaddress1, /^.{3,40}$/, "Enter a valid address (3 to 40 characters).");
+  validateField("workaddress2", inputValues.workaddress2, /^.{3,40}$/, "Enter a valid address (3 to 40 characters).");
+  validateField("workaddress3", inputValues.workaddress3, /^.{3,40}$/, "Enter a valid address (3 to 40 characters).");
+  validateField("officePincode", inputValues.officePincode, regexPatterns.pincode, "Invalid Pin Code.");
+  validateField("officeMailId", inputValues.officeMailId, regexPatterns.email, "Invalid officeMailId.");
+  validateField("designation", inputValues.designation, /^[0-9]+$/, "Designation is required and should be a number.");
+  validateField("workingMonths", inputValues.workingMonths, regexPatterns.numeric, "Number of working months cannot be zero.");
+  validateField("totalExpMonths", inputValues.totalExpMonths, regexPatterns.numeric, "Number of totalExpMonths cannot be zero.");
+  validateField("landlineNumber", inputValues.landlineNumber, regexPatterns.numeric, "Landline number cannot be empty or zero.");
+  validateField("phoneNo", inputValues.phoneNo, /^[0-9]{10,15}$/, "Enter a valid phone number (10 to 15 digits).");
+
+  return errors;
+};
+
+// Use validateForm function in handleSubmit
+const handleSubmit = (e) => {
+  e.preventDefault();
+  const validationErrors = validateForm(inputFields);
+  setErrors(validationErrors);
+  console.log("Validation Errors ----", validationErrors);
+  if (Object.keys(validationErrors).length === 0) {
+    alert("Form Submitted Successfully");
+  }
+};
