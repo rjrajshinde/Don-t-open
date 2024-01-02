@@ -1,0 +1,81 @@
+"use client";
+import React, { useState } from "react";
+
+function WorkingDetails() {
+  const [inputFields, setInputFields] = useState({
+    company: "",
+    organizationType: "",
+    industryType: "",
+    workaddress1: "",
+    workaddress2: "",
+    workaddress3: "",
+    officePincode: "",
+    officeMailId: "",
+    designation: "",
+    workingMonths: "",
+    totalExpMonths: "",
+    landlineNumber: "",
+    phoneNo: "",
+  });
+
+  const [errors, setErrors] = useState({});
+
+  const validateInput = (inputName, value) => {
+    const regexMap = {
+      company: /^[a-zA-Z\s]+$/,
+      organizationType: /^[a-zA-Z\s]+$/,
+      industryType: /^[a-zA-Z\s]+$/,
+      workaddress1: /^.{3,40}$/,
+      workaddress2: /^.{3,40}$/,
+      workaddress3: /^.{0,40}$/, // Optional, allow up to 40 characters
+      officePincode: /^[1-9][0-9]{5}$/,
+      officeMailId: /^[a-zA-Z0-9+_.-]+@[a-zA-Z0-9.-]+$/,
+      designation: /^[a-zA-Z\s]+$/,
+      workingMonths: /^\d+$/,
+      totalExpMonths: /^\d+$/, // Optional, allow any positive integer
+      landlineNumber: /^[a-zA-Z\s]+$/,
+      phoneNo: /^\d{10,15}$/,
+    };
+
+    const isValid = regexMap[inputName].test(value);
+    return isValid ? "" : `Invalid ${inputName}`;
+  };
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setInputFields((prevInputFields) => ({
+      ...prevInputFields,
+      [name]: value,
+    }));
+    setErrors((prevErrors) => ({
+      ...prevErrors,
+      [name]: validateInput(name, value),
+    }));
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    const validationErrors = {};
+    for (const key in inputFields) {
+      validationErrors[key] = validateInput(key, inputFields[key]);
+    }
+    setErrors(validationErrors);
+
+    if (Object.values(validationErrors).every((error) => error === "")) {
+      alert("Form Submitted Successfully");
+    }
+  };
+
+  return (
+    <>
+      <form onSubmit={handleSubmit}>
+        {/* ... (input fields with labels and error messages) */}
+        <div>
+          <button type="submit">submit</button>
+        </div>
+      </form>
+    </>
+  );
+}
+
+export default WorkingDetails;
