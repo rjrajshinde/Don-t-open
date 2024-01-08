@@ -1,0 +1,56 @@
+import React, { useState } from 'react';
+
+const MyForm = () => {
+  const [inputValues, setInputValues] = useState({});
+  
+  const handleInputChange = (event) => {
+    const { id, value } = event.target;
+    setInputValues({ ...inputValues, [id]: value });
+
+    // Call the validate function here
+    validateInput(id, value);
+  };
+
+  const validateInput = (inputId, inputValue) => {
+    const validationRules = {
+      email: /^[\w-]+(\.[\w-]+)*@[\w-]+(\.[\w-]+)+$/,
+      mobile: /^\d{10}$/,
+      address: /^.{1,100}$/ // Adjust the pattern based on your address validation needs
+      // Add more validation rules for different types as needed
+    };
+
+    const inputType = inputId.split('-')[0];
+    const regexPattern = validationRules[inputType] || /^.*$/; // Default to a pattern that matches any input
+
+    const isValid = regexPattern.test(inputValue);
+
+    if (!isValid) {
+      alert(`Invalid ${inputType} input!`);
+      // Additional actions for invalid input, like clearing the field or displaying an error message
+    }
+  };
+
+  // Render your input fields using a JSON configuration
+  const inputConfig = [
+    { id: 'email-input', type: 'email', placeholder: 'Email', onChange: handleInputChange },
+    { id: 'mobile-input', type: 'mobile', placeholder: 'Mobile', onChange: handleInputChange },
+    { id: 'address-input', type: 'address', placeholder: 'Address', onChange: handleInputChange },
+    // Add more input configurations for different types as needed
+  ];
+
+  return (
+    <div>
+      {inputConfig.map((config) => (
+        <input
+          key={config.id}
+          id={config.id}
+          type="text"
+          placeholder={config.placeholder}
+          onChange={config.onChange}
+        />
+      ))}
+    </div>
+  );
+};
+
+export default MyForm;
