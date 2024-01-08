@@ -1,0 +1,36 @@
+// ... (existing imports)
+
+const MyForm = () => {
+  // ... (existing code)
+
+  useEffect(() => {
+    const hasErrors = Object.values(errors).some((error) => error);
+    setSubmitDisabled(hasErrors || Object.values(inputValues).some((value) => value.trim() === ""));
+  }, [errors, inputValues]);
+
+  // ... (existing code)
+
+  return (
+    <form onSubmit={handleSubmit}>
+      {Object.keys(inputValues).map((inputId) => (
+        <div key={inputId}>
+          <input
+            id={inputId}
+            type="text"
+            placeholder={inputId}
+            value={inputValues[inputId]}
+            onChange={handleInputChange}
+          />
+          {errors[inputId] && (
+            <span style={{ color: "red" }}>Invalid input</span>
+          )}
+        </div>
+      ))}
+      <button type="submit" disabled={submitDisabled}>
+        Submit
+      </button>
+    </form>
+  );
+};
+
+export default MyForm;
