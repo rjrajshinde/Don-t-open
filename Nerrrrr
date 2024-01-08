@@ -1,0 +1,86 @@
+import React, { useState, useEffect } from 'react';
+import { useSelector } from 'react-redux';
+
+const MyForm = () => {
+  const emailData = useSelector((state) => state.emailSlice);
+  const mobileData = useSelector((state) => state.mobileSlice);
+  const addressData = useSelector((state) => state.addressSlice);
+
+  const [inputValues, setInputValues] = useState({});
+  const [errors, setErrors] = useState({});
+  const [submitted, setSubmitted] = useState(false);
+
+  useEffect(() => {
+    // Combine data from different slices to set initial values
+    const initialValues = {
+      'email-input': emailData || '',
+      'mobile-input': mobileData || '',
+      'address-input': addressData || '',
+      // Add more input keys for different slices as needed
+    };
+
+    setInputValues(initialValues);
+  }, [emailData, mobileData, addressData]);
+
+  const handleInputChange = (event) => {
+    const { id, value } = event.target;
+    setInputValues((prevInputValues) => ({ ...prevInputValues, [id]: value }));
+  };
+
+  const validateInput = (inputId, inputValue) => {
+    // Validation logic remains the same
+    // Set errors state based on validation
+    // Here, let's assume a simple validation rule for illustration purposes
+    const isValid = inputValue.trim() !== '';
+    setErrors((prevErrors) => ({ ...prevErrors, [inputId]: !isValid }));
+  };
+
+  const handleSubmit = (event) => {
+    event.preventDefault();
+
+    // Validate all inputs on submit
+    const inputValidationErrors = {};
+    Object.keys(inputValues).forEach((inputId) => {
+      validateInput(inputId, inputValues[inputId]);
+      if (errors[inputId]) {
+        inputValidationErrors[inputId] = true;
+      }
+    });
+
+    setErrors(inputValidationErrors);
+
+    // Check if there are validation errors
+    const hasValidationErrors = Object.values(inputValidationErrors).some((error) => error);
+
+    // Check for errors and show alert
+    if (hasValidationErrors) {
+      alert('Errors in form submission. Please correct the errors.');
+    } else {
+      // Access inputValues for further processing or submit the form
+      console.log('Form submitted with values:', inputValues);
+      setSubmitted(true);
+    }
+  };
+
+  return (
+    <form onSubmit={handleSubmit}>
+      {Object.keys(inputValues).map((inputId) => (
+        <div key={inputId}>
+          <input
+            id={inputId}
+            type="text"
+            placeholder={inputId}
+            value={inputValues[inputId]}
+            onChange={handleInputChange}
+          />
+          {submitted && errors[inputId] && <span style={{ color: 'red' }}>Invalid input</span>}
+        </div>
+      ))}
+      <button type="submit">
+        Submit
+      </button>
+    </form>
+  );
+};
+
+export default MyForm;
