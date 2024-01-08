@@ -1,0 +1,22 @@
+import React, { useState, useEffect } from 'react';
+import { useSelector } from 'react-redux';
+
+const MyForm = () => {
+  const reduxInitialValues = useSelector((state) => state.yourReduxSlice); // Replace with your actual Redux state slice
+
+  const [inputValues, setInputValues] = useState(reduxInitialValues || {});
+  const [errors, setErrors] = useState({});
+
+  useEffect(() => {
+    // Set initial values from Redux store when component mounts
+    setInputValues(reduxInitialValues || {});
+  }, [reduxInitialValues]);
+
+  const handleInputChange = (event) => {
+    const { id, value } = event.target;
+    setInputValues((prevInputValues) => ({ ...prevInputValues, [id]: value }));
+    validateInput(id, value);
+  };
+
+  // ... rest of the code remains unchanged
+};
