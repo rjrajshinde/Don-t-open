@@ -1,0 +1,47 @@
+import React, { useState } from 'react';
+
+const MyForm = () => {
+  const [inputValues, setInputValues] = useState({});
+
+  const handleInputChange = (event) => {
+    const { id, value } = event.target;
+    setInputValues((prevInputValues) => ({ ...prevInputValues, [id]: value }));
+    validateInput(id, value);
+  };
+
+  const validateInput = (inputId, inputValue) => {
+    // Validation logic remains the same
+    // ...
+  };
+
+  const handleSubmit = (event) => {
+    event.preventDefault();
+    // Access inputValues for further processing or submit the form
+    console.log('Form submitted with values:', inputValues);
+  };
+
+  const inputConfig = [
+    { id: 'email-input', type: 'email', placeholder: 'Email' },
+    { id: 'mobile-input', type: 'mobile', placeholder: 'Mobile' },
+    { id: 'address-input', type: 'address', placeholder: 'Address' },
+    // Add more input configurations for different types as needed
+  ];
+
+  return (
+    <form onSubmit={handleSubmit}>
+      {inputConfig.map((config) => (
+        <input
+          key={config.id}
+          id={config.id}
+          type="text"
+          placeholder={config.placeholder}
+          value={inputValues[config.id] || ''}
+          onChange={handleInputChange}
+        />
+      ))}
+      <button type="submit">Submit</button>
+    </form>
+  );
+};
+
+export default MyForm
