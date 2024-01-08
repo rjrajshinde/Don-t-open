@@ -1,0 +1,89 @@
+import React from "react";
+import { render, fireEvent, waitFor } from "@testing-library/react";
+import { Provider } from "react-redux";
+import configureStore from "redux-mock-store";
+import MyForm from "./MyForm";
+
+// Mocking Redux store
+const mockStore = configureStore([]);
+const initialState = {
+  emailSlice: "",
+  mobileSlice: "",
+  addressSlice: "",
+};
+const store = mockStore(initialState);
+
+describe("MyForm Component", () => {
+  it("renders form elements correctly", () => {
+    const { getByPlaceholderText, getByText } = render(
+      <Provider store={store}>
+        <MyForm />
+      </Provider>
+    );
+
+    expect(getByPlaceholderText("email")).toBeInTheDocument();
+    expect(getByPlaceholderText("mobile")).toBeInTheDocument();
+    expect(getByPlaceholderText("address")).toBeInTheDocument();
+    expect(getByText("Submit")).toBeInTheDocument();
+  });
+
+  it("handles input changes and validation", async () => {
+    const { getByPlaceholderText, getByText } = render(
+      <Provider store={store}>
+        <MyForm />
+      </Provider>
+    );
+
+    fireEvent.change(getByPlaceholderText("email"), {
+      target: { value: "invalidemail" },
+    });
+    fireEvent.change(getByPlaceholderText("mobile"), {
+      target: { value: "123" },
+    });
+    fireEvent.change(getByPlaceholderText("address"), {
+      target: { value: "" },
+    });
+
+    // Validate error messages
+    expect(getByText("Invalid input")).toBeInTheDocument();
+
+    // Validate submit button state
+    expect(getByText("Submit")).toBeDisabled();
+
+    // Fix the input values
+    fireEvent.change(getByPlaceholderText("email"), {
+      target: { value: "validemail@example.com" },
+    });
+    fireEvent.change(getByPlaceholderText("mobile"), {
+      target: { value: "1234567890" },
+    });
+
+    // Validate no error messages
+    expect(() => getByText("Invalid input")).toThrow();
+
+    // Validate submit button state
+    await waitFor(() => expect(getByText("Submit")).not.toBeDisabled());
+  });
+
+  it("submits the form with valid data", async () => {
+    const { getByPlaceholderText, getByText } = render(
+      <Provider store={store}>
+        <MyForm />
+      </Provider>
+    );
+
+    fireEvent.change(getByPlaceholderText("email"), {
+      target: { value: "validemail@example.com" },
+    });
+    fireEvent.change(getByPlaceholderText("mobile"), {
+      target: { value: "1234567890" },
+    });
+    fireEvent.change(getByPlaceholderText("address"), {
+      target: { value: "123 Main St" },
+    });
+
+    fireEvent.click(getByText("Submit"));
+
+    // You may want to mock the console.log and check if it was called with the expected values
+  });
+});
