@@ -1,0 +1,74 @@
+import React, { useState } from 'react';
+
+const MyForm = () => {
+  const [inputValues, setInputValues] = useState({});
+  const [errors, setErrors] = useState({});
+
+  const handleInputChange = (event) => {
+    const { id, value } = event.target;
+    setInputValues((prevInputValues) => ({ ...prevInputValues, [id]: value }));
+    validateInput(id, value);
+  };
+
+  const validateInput = (inputId, inputValue) => {
+    const validationRules = {
+      email: /^[\w-]+(\.[\w-]+)*@[\w-]+(\.[\w-]+)+$/,
+      mobile: /^\d{10}$/,
+      address: /^.{1,100}$/ // Adjust the pattern based on your address validation needs
+      // Add more validation rules for different types as needed
+    };
+
+    const inputType = inputId.split('-')[0];
+    const regexPattern = validationRules[inputType] || /^.*$/; // Default to a pattern that matches any input
+
+    const isValid = regexPattern.test(inputValue);
+
+    setErrors((prevErrors) => ({ ...prevErrors, [inputId]: !isValid }));
+  };
+
+  const handleSubmit = (event) => {
+    event.preventDefault();
+
+    // Check validation on submit
+    const hasValidationErrors = Object.values(errors).some((error) => error);
+
+    if (!hasValidationErrors) {
+      // Access inputValues for further processing or submit the form
+      console.log('Form submitted with values:', inputValues);
+      alert('Form submitted successfully!');
+    } else {
+      alert('Please correct the errors before submitting.');
+    }
+  };
+
+  const inputConfig = [
+    { id: 'email-input', type: 'email', placeholder: 'Email' },
+    { id: 'mobile-input', type: 'mobile', placeholder: 'Mobile' },
+    { id: 'address-input', type: 'address', placeholder: 'Address' },
+    // Add more input configurations for different types as needed
+  ];
+
+  const hasValidationErrors = Object.values(errors).some((error) => error);
+
+  return (
+    <form onSubmit={handleSubmit}>
+      {inputConfig.map((config) => (
+        <div key={config.id}>
+          <input
+            id={config.id}
+            type="text"
+            placeholder={config.placeholder}
+            value={inputValues[config.id] || ''}
+            onChange={handleInputChange}
+          />
+          {errors[config.id] && <span style={{ color: 'red' }}>Invalid {config.type} input</span>}
+        </div>
+      ))}
+      <button type="submit" disabled={hasValidationErrors}>
+        Submit
+      </button>
+    </form>
+  );
+};
+
+export default MyForm;
