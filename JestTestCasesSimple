@@ -1,0 +1,55 @@
+import React from "react";
+import { render, fireEvent, screen } from "@testing-library/react";
+import MyForm from "./MyForm";
+
+test("renders MyForm component", () => {
+  render(<MyForm />);
+  const formElement = screen.getByTestId("my-form");
+  expect(formElement).toBeInTheDocument();
+});
+
+test("handles input changes correctly", () => {
+  render(<MyForm />);
+  const emailInput = screen.getByPlaceholderText("email");
+  const mobileInput = screen.getByPlaceholderText("mobile");
+  const addressInput = screen.getByPlaceholderText("address");
+
+  fireEvent.change(emailInput, { target: { value: "test@example.com" } });
+  fireEvent.change(mobileInput, { target: { value: "1234567890" } });
+  fireEvent.change(addressInput, { target: { value: "123 Main St" } });
+
+  expect(emailInput.value).toBe("test@example.com");
+  expect(mobileInput.value).toBe("1234567890");
+  expect(addressInput.value).toBe("123 Main St");
+});
+
+test("handles form submission correctly with valid input", () => {
+  render(<MyForm />);
+  const emailInput = screen.getByPlaceholderText("email");
+  const mobileInput = screen.getByPlaceholderText("mobile");
+  const addressInput = screen.getByPlaceholderText("address");
+  const submitButton = screen.getByText("Submit");
+
+  fireEvent.change(emailInput, { target: { value: "test@example.com" } });
+  fireEvent.change(mobileInput, { target: { value: "1234567890" } });
+  fireEvent.change(addressInput, { target: { value: "123 Main St" } });
+
+  fireEvent.click(submitButton);
+
+  // You can add more assertions based on your specific logic for form submission
+  // For example, check if the form is not disabled, or if it logs the correct values.
+
+  // expect(...).toBe(...);
+});
+
+test("handles form submission correctly with invalid input", () => {
+  render(<MyForm />);
+  const submitButton = screen.getByText("Submit");
+
+  fireEvent.click(submitButton);
+
+  // Add assertions to check if the form submission is blocked due to validation errors
+  // For example, check if an alert is shown.
+
+  // expect(...).toBe(...);
+});
