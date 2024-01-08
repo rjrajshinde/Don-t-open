@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 
 const MyForm = () => {
   const [inputValues, setInputValues] = useState({});
+  const [errors, setErrors] = useState({});
 
   const handleInputChange = (event) => {
     const { id, value } = event.target;
@@ -10,12 +11,30 @@ const MyForm = () => {
   };
 
   const validateInput = (inputId, inputValue) => {
-    // Validation logic remains the same
-    // ...
+    const validationRules = {
+      email: /^[\w-]+(\.[\w-]+)*@[\w-]+(\.[\w-]+)+$/,
+      mobile: /^\d{10}$/,
+      address: /^.{1,100}$/ // Adjust the pattern based on your address validation needs
+      // Add more validation rules for different types as needed
+    };
+
+    const inputType = inputId.split('-')[0];
+    const regexPattern = validationRules[inputType] || /^.*$/; // Default to a pattern that matches any input
+
+    const isValid = regexPattern.test(inputValue);
+
+    setErrors((prevErrors) => ({ ...prevErrors, [inputId]: !isValid }));
   };
 
   const handleSubmit = (event) => {
     event.preventDefault();
+
+    // Check if there are any errors before submitting
+    if (Object.values(errors).some((error) => error)) {
+      alert('Please correct the errors before submitting.');
+      return;
+    }
+
     // Access inputValues for further processing or submit the form
     console.log('Form submitted with values:', inputValues);
   };
@@ -30,18 +49,20 @@ const MyForm = () => {
   return (
     <form onSubmit={handleSubmit}>
       {inputConfig.map((config) => (
-        <input
-          key={config.id}
-          id={config.id}
-          type="text"
-          placeholder={config.placeholder}
-          value={inputValues[config.id] || ''}
-          onChange={handleInputChange}
-        />
+        <div key={config.id}>
+          <input
+            id={config.id}
+            type="text"
+            placeholder={config.placeholder}
+            value={inputValues[config.id] || ''}
+            onChange={handleInputChange}
+          />
+          {errors[config.id] && <span style={{ color: 'red' }}>Invalid {config.type} input</span>}
+        </div>
       ))}
       <button type="submit">Submit</button>
     </form>
   );
 };
 
-export default MyForm
+export default MyForm;
