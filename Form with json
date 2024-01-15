@@ -1,0 +1,66 @@
+import React, { useState } from 'react';
+
+const MyForm = () => {
+  // State to manage form data
+  const [formData, setFormData] = useState({});
+
+  // Handle form field changes
+  const handleFieldChange = (fieldKey, value) => {
+    setFormData((prevData) => ({
+      ...prevData,
+      [fieldKey]: value,
+    }));
+  };
+
+  // Handle form submission
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    // Add logic for form submission (e.g., API call)
+    console.log('Form data submitted:', formData);
+  };
+
+  return (
+    <form onSubmit={handleSubmit}>
+      {jsonData.data.map((section) => (
+        <div key={section.title}>
+          <h2>{section.title}</h2>
+          {section.fields.map((field) => (
+            <div key={field.key[0]}>
+              <label htmlFor={field.key[0]}>{field.label}</label>
+              {field.inputType === 'text' && (
+                <input
+                  type="text"
+                  id={field.key[0]}
+                  placeholder={field.placeholder}
+                  value={formData[field.key[0]] || ''}
+                  onChange={(e) => handleFieldChange(field.key[0], e.target.value)}
+                />
+              )}
+              {field.inputType === 'radio' && (
+                <div>
+                  {field.radioButtons.map((radioButton) => (
+                    <label key={radioButton.id}>
+                      <input
+                        type="radio"
+                        name={field.key[0]}
+                        value={radioButton.id}
+                        checked={formData[field.key[0]] === radioButton.id}
+                        onChange={(e) => handleFieldChange(field.key[0], e.target.value)}
+                      />
+                      {radioButton.name}
+                    </label>
+                  ))}
+                </div>
+              )}
+              {/* Add other input types as needed */}
+              <div style={{ color: 'red' }}>{field.inValid && field.validation.errorText}</div>
+            </div>
+          ))}
+        </div>
+      ))}
+      <button type="submit">Submit</button>
+    </form>
+  );
+};
+
+export default MyForm
