@@ -1,0 +1,149 @@
+import React, { useState, useEffect } from 'react';
+
+const MyForm = () => {
+  const [formData, setFormData] = useState({});
+  const [formErrors, setFormErrors] = useState({});
+
+  useEffect(() => {
+    // Set initial form data based on JSON values
+    const initialFormData = {};
+    jsonData.data.forEach((section) => {
+      section.fields.forEach((field) => {
+        if (field.value !== undefined) {
+          initialFormData[field.key[0]] = field.value;
+        }
+      });
+    });
+    setFormData(initialFormData);
+  }, []); // Empty dependency array ensures this effect runs only once on component mount
+
+  const handleFieldChange = (fieldKey, value) => {
+    setFormData((prevData) => ({
+      ...prevData,
+      [fieldKey]: value,
+    }));
+    validateField(fieldKey, value);
+  };
+
+  const validateField = (fieldKey, value) => {
+    const field = getFieldByKey(fieldKey);
+    const regex = new RegExp(field.validation.params[0]);
+
+    if (field.validation.required && !value) {
+      setFormErrors((prevErrors) => ({
+        ...prevErrors,
+        [fieldKey]: 'This field is required.',
+      }));
+    } else if (value && !regex.test(value)) {
+      setFormErrors((prevErrors) => ({
+        ...prevErrors,
+        [fieldKey]: field.validation.errorText,
+      }));
+    } else {
+      setFormErrors((prevErrors) => ({
+        ...prevErrors,
+        [fieldKey]: undefined,
+      }));
+    }
+  };
+
+  const getFieldByKey = (key) => {
+    for (const section of jsonData.data) {
+      for (const field of section.fields) {
+        if (field.key.includes(key)) {
+          return field;
+        }
+      }
+    }
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+
+    // Check for errors before submitting
+    for (const section of jsonData.data) {
+      for (const field of section.fields) {
+        if (field.validation.required && !formData[field.key[0]]) {
+          setFormErrors((prevErrors) => ({
+            ...prevErrors,
+            [field.key[0]]: 'This field is required.',
+          }));
+        } else {
+          validateField(field.key[0], formData[field.key[0]]);
+        }
+      }
+    }
+
+    // If there are no errors, proceed with form submission
+    if (Object.keys(formErrors).length === 0) {
+      // Add logic for form submission (e.g., API call)
+      console.log('Form data submitted:', formData);
+    }
+  };
+
+  return (
+    <form onSubmit={handleSubmit}>
+      {jsonData.data.map((section) => (
+        <div key={section.title}>
+          <h2>{section.title}</h2>
+          {section.fields.map((field) => (
+            <div key={field.key[0]}>
+              <label htmlFor={field.key[0]}>{field.label}</label>
+              {field.inputType === 'text' && (
+                <div>
+                  <input
+                    type="text"
+                    id={field.key[0]}
+                    placeholder={field.placeholder}
+                    value={formData[field.key[0]] || ''}
+                    onChange={(e) => handleFieldChange(field.key[0], e.target.value)}
+                  />
+                  <div style={{ color: 'red' }}>{formErrors[field.key[0]]}</div>
+                </div>
+              )}
+              {field.inputType === 'radio' && (
+                <div>
+                  {field.radioButtons.map((radioButton) => (
+                    <label key={radioButton.id}>
+                      <input
+                        type="radio"
+                        name={field.key[0]}
+                        value={radioButton.id}
+                        checked={formData[field.key[0]] === radioButton.id}
+                        onChange={(e) => handleFieldChange(field.key[0], e.target.value)}
+                      />
+                      {radioButton.name}
+                    </label>
+                  ))}
+                  <div style={{ color: 'red' }}>{formErrors[field.key[0]]}</div>
+                </div>
+              )}
+              {field.inputType === 'dropdown' && (
+                <div>
+                  <select
+                    id={field.key[0]}
+                    value={formData[field.key[0]] || ''}
+                    onChange={(e) => handleFieldChange(field.key[0], e.target.value)}
+                  >
+                    <option value="" disabled>
+                      {field.placeholder}
+                    </option>
+                    {field.radioButtons.map((option) => (
+                      <option key={option} value={option}>
+                        {option}
+                      </option>
+                    ))}
+                  </select>
+                  <div style={{ color: 'red' }}>{formErrors[field.key[0]]}</div>
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      ))}
+      <button type="submit">Submit</button>
+    </form>
+  );
+};
+
+export default MyForm;
